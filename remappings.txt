@@ -1,6 +1,9 @@
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
 openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/
+@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
+openzeppelin-contracts/=lib/openzeppelin-contracts/
+@openzeppelin/=lib/openzeppelin-contracts/
 safe-contracts/=lib/safe-contracts/contracts/
 @gnosis.pm/=lib/safe-contracts/contracts/
 safe-tools/=lib/safe-tools/src/
