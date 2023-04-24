@@ -63,7 +63,6 @@ contract SafeModuleTest is Test, SafeTestTools {
 
         bytes memory execModule = abi.encodeWithSelector(SafeModuleSimple.fooCall.selector);
 
-        address alice = address(0x1234);
         uint256[] memory ownerPKs = new uint256[](1);
         ownerPKs[0] = 12345;
 
@@ -91,7 +90,6 @@ contract SafeModuleTest is Test, SafeTestTools {
 
         bytes memory execModule = abi.encodeWithSelector(SafeModuleSimple.fooCall.selector);
 
-        address alice = address(0x1234);
         uint256[] memory ownerPKs = new uint256[](1);
         ownerPKs[0] = 12345;
 
