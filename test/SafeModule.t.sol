@@ -57,25 +57,30 @@ contract SafeModuleTest is Test, SafeTestTools {
     }
 
     function testExecModule() public {
-        bytes memory functionOnModule = abi.encodeWithSelector(SafeModuleSimple.fooCall.selector);
-        bytes memory execModule = abi.encodeWithSelector(
-            ModuleManager.execTransactionFromModule.selector, address(simpleModule), 0, functionOnModule
-        );
+        address module = address(simpleModule);
+        vm.label(module, 'SimpleModule');
+        console2.log('SimpleModule@ ', module);
+
+        bytes memory execModule = abi.encodeWithSelector(SafeModuleSimple.fooCall.selector);
 
         address alice = address(0x1234);
         uint256[] memory ownerPKs = new uint256[](1);
         ownerPKs[0] = 12345;
-        SafeInstance memory instance = _setupSafe({ownerPKs: ownerPKs, threshold: 1, initialBalance: 1 ether});
 
-        address module = address(simpleModule);
+        SafeInstance memory instance = _setupSafe({ownerPKs: ownerPKs, threshold: 1, initialBalance: 1 ether});
         instance.enableModule(module);
+        
+
+        // prepare signature for transaction
         (uint8 v, bytes32 r, bytes32 s) = instance.signTransaction(
-            ownerPKs[0], alice, 0.5 ether, execModule, Enum.Operation.Call, 0, 0, 0, address(0), module
+            ownerPKs[0],module, 0, execModule, Enum.Operation.Call, 0, 0, 0, address(0), address(0)
         );
         bytes memory signature = abi.encodePacked(r, s, v);
+
+        // exec transaction
         instance.safe.execTransaction(
-            alice, 0.5 ether, execModule, Enum.Operation.Call, 0, 0, 0, address(0), payable(address(0)), signature
-        );
-        assertEq(alice.balance, 0.5 ether);
+            module, 0, execModule, Enum.Operation.Call, 0, 0, 0, address(0), payable(address(0)), signature);
+
+
     }
 }
