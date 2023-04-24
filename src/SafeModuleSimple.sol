@@ -5,15 +5,11 @@ import {Module} from "zodiac/core/Module.sol";
 import "forge-std/console2.sol";
 
 contract SafeModuleSimple is Module {
-    function setUp(bytes memory initParams) override public {}
+    function setUp(bytes memory initParams) public override {}
 
     function fooCall() external returns (uint256) {
-        console2.log("fooCall");
+        console2.log("fooCall, sender: %s, this: %s", msg.sender, address(this));
         return 1337;
     }
 
-    function fooDelegatecall() external returns (uint256) {
-        console2.log("fooDelegatecall");
-        return 1338;
-    }
 }

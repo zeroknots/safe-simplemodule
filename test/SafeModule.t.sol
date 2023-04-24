@@ -58,8 +58,8 @@ contract SafeModuleTest is Test, SafeTestTools {
 
     function testExecModule() public {
         address module = address(simpleModule);
-        vm.label(module, 'SimpleModule');
-        console2.log('SimpleModule@ ', module);
+        vm.label(module, "SimpleModule");
+        console2.log("SimpleModule@ ", module);
 
         bytes memory execModule = abi.encodeWithSelector(SafeModuleSimple.fooCall.selector);
 
@@ -69,18 +69,45 @@ contract SafeModuleTest is Test, SafeTestTools {
 
         SafeInstance memory instance = _setupSafe({ownerPKs: ownerPKs, threshold: 1, initialBalance: 1 ether});
         instance.enableModule(module);
-        
+        console2.log("SafeInstance @ %s", address(instance.safe));
 
         // prepare signature for transaction
         (uint8 v, bytes32 r, bytes32 s) = instance.signTransaction(
-            ownerPKs[0],module, 0, execModule, Enum.Operation.Call, 0, 0, 0, address(0), address(0)
+            ownerPKs[0], module, 0, execModule, Enum.Operation.Call, 0, 0, 0, address(0), address(0)
         );
         bytes memory signature = abi.encodePacked(r, s, v);
 
         // exec transaction
         instance.safe.execTransaction(
-            module, 0, execModule, Enum.Operation.Call, 0, 0, 0, address(0), payable(address(0)), signature);
+            module, 0, execModule, Enum.Operation.Call, 0, 0, 0, address(0), payable(address(0)), signature
+        );
+    }
 
 
+    function testExecModuleDelegate() public {
+        address module = address(simpleModule);
+        vm.label(module, "SimpleModule");
+        console2.log("SimpleModule@ ", module);
+
+        bytes memory execModule = abi.encodeWithSelector(SafeModuleSimple.fooCall.selector);
+
+        address alice = address(0x1234);
+        uint256[] memory ownerPKs = new uint256[](1);
+        ownerPKs[0] = 12345;
+
+        SafeInstance memory instance = _setupSafe({ownerPKs: ownerPKs, threshold: 1, initialBalance: 1 ether});
+        instance.enableModule(module);
+        console2.log("SafeInstance @ %s", address(instance.safe));
+
+        // prepare signature for transaction
+        (uint8 v, bytes32 r, bytes32 s) = instance.signTransaction(
+            ownerPKs[0], module, 0, execModule, Enum.Operation.DelegateCall, 0, 0, 0, address(0), address(0)
+        );
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        // exec transaction
+        instance.safe.execTransaction(
+            module, 0, execModule, Enum.Operation.DelegateCall, 0, 0, 0, address(0), payable(address(0)), signature
+        );
     }
 }
