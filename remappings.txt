@@ -1,0 +1,7 @@
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
+safe-contracts/=lib/safe-tools/lib/safe-contracts/contracts/
+safe-tools/=lib/safe-tools/src/
+solady/=lib/safe-tools/lib/solady/src/
+solmate/=lib/safe-tools/lib/solady/lib/solmate/src/
+zodiac/=lib/zodiac/contracts/
