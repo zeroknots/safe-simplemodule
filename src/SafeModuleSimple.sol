@@ -11,5 +11,4 @@ contract SafeModuleSimple is Module {
         console2.log("fooCall, sender: %s, this: %s", msg.sender, address(this));
         return 1337;
     }
-
 }
