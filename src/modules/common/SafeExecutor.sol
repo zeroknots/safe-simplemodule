@@ -1,21 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.4;
 
-import {FactoryFriendly} from "./FactoryFriendly.sol";
+import "./Executor.sol";
+import "./Module.sol";
 
-struct ModuleStorage {
-    /// @dev address that will execute the transaction.
-    /// this is used for Safe moduleExec
-    address avatar;
-}
-
-abstract contract Module is FactoryFriendly {
-    function slot() internal pure virtual returns (ModuleStorage storage ms);
-
-    function setAvatar(address _avatar) public onlyOwner {
-        slot().avatar = _avatar;
-    }
-
+abstract contract SafeExecutor is Executor, Module {
     /// @dev Passes a transaction to be executed by the avatar.
     /// @notice Can only be called by this contract.
     /// @param to Destination address of module transaction.
@@ -26,7 +15,8 @@ abstract contract Module is FactoryFriendly {
         internal
         returns (bool success)
     {
-        address currentGuard = guard;
+        address currentGuard = guard();
+        address target = avatar();
         if (currentGuard != address(0)) {
             IGuard(currentGuard).checkTransaction(
                 /// Transaction info used by module transactions.
