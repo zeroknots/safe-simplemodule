@@ -4,6 +4,8 @@ import {Module} from "zodiac/core/Module.sol";
 import "safe-contracts/base/Executor.sol";
 import "safe-contracts/common/Enum.sol";
 
+import "forge-std/console2.sol";
+
 library StorageLib {
     bytes32 constant RHINESTONE_CLIENT_STORAGE_POSITION = keccak256("zodiac.rhinestone.RhinestoneClient.storage");
 
@@ -32,17 +34,17 @@ contract RhinestoneClient is Executor, Module {
 
     function installModule() external {}
 
-    function installSafeModule(bytes32 moduleID) external {
+    function installSafeModule() external {
+        console2.log("installSafeModule");
 
         // check Rhienstone Registry
         // address module = ...
         // bytes4[] memory functionSigs = ...
-        IModuleManager(address(this)).enableModule(module);
-        StorageLib.storagePosition().modules[functionSig] = module;
+        // IModuleManager(address(this)).enableModule(module);
+        // StorageLib.storagePosition().modules[functionSig] = module;
     }
 
-    function getImpl(bytes4 functionSig) external returns (address module) {
-        module = StorageLib.storagePosition().modules[functionSig];
-    }
-
+    // function getImpl(bytes4 functionSig) external returns (address module) {
+    //     module = StorageLib.storagePosition().modules[functionSig];
+    // }
 }
