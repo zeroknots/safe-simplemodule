@@ -20,7 +20,7 @@ library LogicStorageLib {
     }
 }
 
-contract ModuleReferenceImplementation is Module {
+abstract contract ModuleReferenceImplementation is Module {
     bytes32 constant moduleSlot = keccak256("storage.location.moduleConst");
 
     function setUp(bytes memory initializeParams) public override {

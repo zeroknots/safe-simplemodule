@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "./Executor.sol";
 import "./Module.sol";
 
-abstract contract SafeExecutor is Executor, Module {
+abstract contract DiamondExecutor is Executor, Module {
     /// @dev Passes a transaction to be executed by the avatar.
     /// @notice Can only be called by this contract.
     /// @param to Destination address of module transaction.
@@ -16,8 +16,6 @@ abstract contract SafeExecutor is Executor, Module {
         override
         returns (bool success)
     {
-        address currentGuard = guard();
-        address target = avatar();
         return true;
     }
 
