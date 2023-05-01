@@ -10,15 +10,16 @@ import "../../interfaces/Safe.sol";
 /// TODO should implement default fallback methods
 abstract contract EIP4337Module is HandlerContext, CompatibilityFallbackHandler {
     using UserOperationLib for UserOperation;
-    bytes32 private constant DOMAIN_SEPARATOR_TYPEHASH = keccak256("EIP712Domain(uint256 chainId,address verifyingContract)");
 
-    bytes32 private constant SAFE_OP_TYPEHASH =
-        keccak256(
-            "SafeOp(address safe,bytes callData,uint256 nonce,uint256 verificationGas,uint256 preVerificationGas,uint256 maxFeePerGas,uint256 maxPriorityFeePerGas,uint256 callGas,address entryPoint)"
-        );
+    bytes32 private constant DOMAIN_SEPARATOR_TYPEHASH =
+        keccak256("EIP712Domain(uint256 chainId,address verifyingContract)");
 
-    address immutable public supportedEntryPoint;
-    bytes4 immutable public expectedExecutionFunctionId;
+    bytes32 private constant SAFE_OP_TYPEHASH = keccak256(
+        "SafeOp(address safe,bytes callData,uint256 nonce,uint256 verificationGas,uint256 preVerificationGas,uint256 maxFeePerGas,uint256 maxPriorityFeePerGas,uint256 callGas,address entryPoint)"
+    );
+
+    address public immutable supportedEntryPoint;
+    bytes4 public immutable expectedExecutionFunctionId;
 
     constructor(address entryPoint, bytes4 executionFunctionId) {
         supportedEntryPoint = entryPoint;
@@ -28,11 +29,10 @@ abstract contract EIP4337Module is HandlerContext, CompatibilityFallbackHandler 
     /// @dev Validates user operation provided by the entry point
     /// @param userOp User operation struct
     /// @param requiredPrefund Required prefund to execute the operation
-    function validateUserOp(
-        UserOperation calldata userOp,
-        bytes32,
-        uint256 requiredPrefund
-    ) external returns (uint256){
+    function validateUserOp(UserOperation calldata userOp, bytes32, uint256 requiredPrefund)
+        external
+        returns (uint256)
+    {
         address payable safeAddress = payable(userOp.sender);
         // The entryPoint address is appended to the calldata in `HandlerContext` contract
         // Because of this, the relayer may be manipulate the entryPoint address, therefore we have to verify that
@@ -56,7 +56,7 @@ abstract contract EIP4337Module is HandlerContext, CompatibilityFallbackHandler 
         return 0;
     }
 
-    function validateReplayProtection(UserOperation calldata userOp) virtual internal;
+    function validateReplayProtection(UserOperation calldata userOp) internal virtual;
 
     function domainSeparator() public view returns (bytes32) {
         return keccak256(abi.encode(DOMAIN_SEPARATOR_TYPEHASH, block.chainid, this));
@@ -123,15 +123,15 @@ abstract contract EIP4337Module is HandlerContext, CompatibilityFallbackHandler 
     }
 }
 
-
 contract Simple4337Module is EIP4337Module {
-
     // NOTE There is a change proposed to EIP-4337 to move nonce tracking to the entrypoint
     mapping(address => mapping(bytes32 => uint64)) private nonces;
 
-    constructor(address entryPoint) EIP4337Module(entryPoint, bytes4(keccak256("execTransactionFromModule(address,uint256,bytes,uint8)"))) {}
+    constructor(address entryPoint)
+        EIP4337Module(entryPoint, bytes4(keccak256("execTransactionFromModule(address,uint256,bytes,uint8)")))
+    {}
 
-    function validateReplayProtection(UserOperation calldata userOp) override internal {
+    function validateReplayProtection(UserOperation calldata userOp) internal override {
         // We need to increase the nonce to make it impossible to drain the safe by making it send prefunds for the same transaction
         // Right shifting fills up with 0s from the left
         bytes32 key = bytes32(userOp.nonce >> 64);
@@ -143,13 +143,10 @@ contract Simple4337Module is EIP4337Module {
     }
 }
 
-
 contract DoubleCheck4337Module is EIP4337Module {
-
-    bytes32 private constant SAFE_4337_EXECUTION_TYPEHASH =
-        keccak256(
-            "Safe4337Execution(address safe,address target,uint256 value,bytes calldata data,uint8 operation,uint256 nonce)"
-        );
+    bytes32 private constant SAFE_4337_EXECUTION_TYPEHASH = keccak256(
+        "Safe4337Execution(address safe,address target,uint256 value,bytes calldata data,uint8 operation,uint256 nonce)"
+    );
 
     struct ExecutionStatus {
         bool approved;
@@ -158,7 +155,9 @@ contract DoubleCheck4337Module is EIP4337Module {
 
     mapping(address => mapping(bytes32 => ExecutionStatus)) private hashes;
 
-    constructor(address entryPoint) EIP4337Module(entryPoint, bytes4(keccak256("checkAndExecTransaction(address,address,uint256,bytes,uint8,uint256)"))) {}
+    constructor(address entryPoint)
+        EIP4337Module(entryPoint, bytes4(keccak256("checkAndExecTransaction(address,address,uint256,bytes,uint8,uint256)")))
+    {}
 
     function encodeSafeExecutionData(
         address safe,
@@ -168,27 +167,16 @@ contract DoubleCheck4337Module is EIP4337Module {
         uint8 operation,
         uint256 nonce
     ) public view returns (bytes memory) {
-        bytes32 safeExecutionTypeData = keccak256(
-            abi.encode(
-                SAFE_4337_EXECUTION_TYPEHASH,
-                safe,
-                target,
-                value,
-                keccak256(data),
-                operation,
-                nonce
-            )
-        );
+        bytes32 safeExecutionTypeData =
+            keccak256(abi.encode(SAFE_4337_EXECUTION_TYPEHASH, safe, target, value, keccak256(data), operation, nonce));
 
         return abi.encodePacked(bytes1(0x19), bytes1(0x01), domainSeparator(), safeExecutionTypeData);
     }
 
-    function validateReplayProtection(UserOperation calldata userOp) override internal {
+    function validateReplayProtection(UserOperation calldata userOp) internal override {
         (address safe, address target, uint256 value, bytes memory data, uint8 operation, uint256 nonce) =
             abi.decode(userOp.callData, (address, address, uint256, bytes, uint8, uint256));
-        bytes32 executionHash = keccak256(encodeSafeExecutionData(
-            safe, target, value, data, operation, nonce
-        ));
+        bytes32 executionHash = keccak256(encodeSafeExecutionData(safe, target, value, data, operation, nonce));
         require(userOp.sender == safe, "Unexpected Safe in calldata");
         require(userOp.nonce == nonce, "Unexpected nonce in calldata");
         ExecutionStatus memory status = hashes[userOp.sender][executionHash];
@@ -196,10 +184,15 @@ contract DoubleCheck4337Module is EIP4337Module {
         hashes[userOp.sender][executionHash].approved = true;
     }
 
-    function checkAndExecTransactionFromModule(address safe, address target, uint256 value, bytes calldata data, uint8 operation, uint256 nonce) external {
-        bytes32 executionHash = keccak256(encodeSafeExecutionData(
-            safe, target, value, data, operation, nonce
-        ));
+    function checkAndExecTransactionFromModule(
+        address safe,
+        address target,
+        uint256 value,
+        bytes calldata data,
+        uint8 operation,
+        uint256 nonce
+    ) external {
+        bytes32 executionHash = keccak256(encodeSafeExecutionData(safe, target, value, data, operation, nonce));
         ExecutionStatus memory status = hashes[safe][executionHash];
         require(status.approved && !status.executed, "Unexpected status");
         hashes[safe][executionHash].executed = true;
