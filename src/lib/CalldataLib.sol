@@ -15,12 +15,20 @@ library CalldataLib {
         }
     }
 
+    // function extractSelector(bytes memory callData) internal pure returns (bytes4 functionSig) {
+    //     if (callData.length < 4) revert CalldataLength(callData.length);
+    //     bytes4 functionSig;
+    //     assembly {
+    //         functionSig := mload(add(callData, 0x20))
+    //         functionSig := shl(224, functionSig)
+    //         functionSig := shr(224, functionSig)
+    //     }
+    // }
+
     function extractSelector(bytes memory callData) internal pure returns (bytes4 functionSig) {
-        if (callData.length < 4) revert CalldataLength(callData.length);
+        if (callData.length == 4) return (bytes4(callData));
         assembly {
-            functionSig := mload(add(callData, 0x20))
-            functionSig := shl(224, functionSig)
-            functionSig := shr(224, functionSig)
+            functionSig := shr(224, mload(add(callData, 0x20)))
         }
     }
 

@@ -11,10 +11,10 @@ import "forge-std/console2.sol";
 
 import "../lib/CalldataLib.sol";
 
-contract GuardRouter is Guard {
+contract SubGuardFunctionSigBlacklist is Guard {
     using CalldataLib for bytes;
 
-    mapping(address to => address) subGuards;
+    mapping(bytes4 => bool) public blacklistedFunctionSigs;
 
     constructor() {}
 
@@ -37,21 +37,17 @@ contract GuardRouter is Guard {
         bytes memory,
         address
     ) external override {
-        address subGuard = subGuards[to];
-        console2.logBytes(data);
-
-        // if subGuard for 'to' address is set. Forward this checkTransaction
-        if (subGuards[to] != address(0)) {
-            console2.log("Found subguard @: %s", subGuard);
-            Guard(subGuard).checkTransaction(
-                to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, data, msg.sender
-            );
+        bytes4 functionSig = CalldataLib.extractSelector(data);
+        if (blacklistedFunctionSigs[functionSig]) {
+            revert("Function signature is blacklisted");
         }
     }
 
     function checkAfterExecution(bytes32, bool) external view override {}
 
-    function setSubGuard(address _to, address _guard) public {
-        subGuards[_to] = _guard;
+    function setBlacklistedFunctionSig(bytes4 _functionSig, bool _isBlacklisted) public {
+        console2.log("Blacklisting:");
+        console2.logBytes4(_functionSig);
+        blacklistedFunctionSigs[_functionSig] = _isBlacklisted;
     }
 }
