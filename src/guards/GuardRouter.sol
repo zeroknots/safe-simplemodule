@@ -14,7 +14,8 @@ import "../lib/CalldataLib.sol";
 contract GuardRouter is Guard {
     using CalldataLib for bytes;
 
-    mapping(address to => address) subGuards;
+
+    mapping(address to => mapping(Enum.Operation => address)) subGuard;
 
     constructor() {}
 
@@ -37,11 +38,11 @@ contract GuardRouter is Guard {
         bytes memory,
         address
     ) external override {
-        address subGuard = subGuards[to];
+        address subGuard = subGuards[to][operation];
         console2.logBytes(data);
 
         // if subGuard for 'to' address is set. Forward this checkTransaction
-        if (subGuards[to] != address(0)) {
+        if (subGuard != address(0)) {
             console2.log("Found subguard @: %s", subGuard);
             Guard(subGuard).checkTransaction(
                 to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, data, msg.sender

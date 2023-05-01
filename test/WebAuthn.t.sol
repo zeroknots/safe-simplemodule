@@ -17,7 +17,35 @@ contract WebauthnTest is ERC4337Test {
         webauthn = new WebAuthn();
     }
 
-    function testERC4337() public {}
+    function testERC4337() public {
+
+
+      address receiver = makeAddr("receiver");
+
+      address safeAccount = address(instance.safe);
+
+
+      bytes memory callData;
+
+      uint256 nonce = 0;
+
+
+      bytes memory useropsDigest = erc4337Module.encodeOperationData({
+        safe: safeAccount,
+        callData: callData,
+        nonce: nonce,
+        verificationGas: 2e6,
+        preVerificationGas: 2e6,
+        maxFeePerGas: 1,
+        maxPriorityFeePerGas: 1,
+        callGas: 2e6,
+        address: entrypoint,
+      });
+
+
+
+
+    }
 
     function testWebAuthn() public {
         // insert tests here
