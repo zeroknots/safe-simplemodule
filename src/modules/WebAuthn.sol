@@ -5,8 +5,6 @@ import "../lib/Secp256r1.sol";
 import "../lib/Base64.sol";
 import "../modules/ERC4337Diatomic/UserOperation.sol";
 
-
-
 library WebAuthnLib {
     bytes32 constant NAMESPACE = "rhinestone.plugin.webauthn";
     bytes32 constant STORAGE_POSITION = keccak256(abi.encodePacked(NAMESPACE));
