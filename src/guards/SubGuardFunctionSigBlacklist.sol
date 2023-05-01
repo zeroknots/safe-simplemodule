@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 import "@gnosis.pm/common/Enum.sol";
 import "@gnosis.pm/base/GuardManager.sol";

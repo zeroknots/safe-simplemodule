@@ -52,9 +52,13 @@ abstract contract EIP4337Module is HandlerContext, CompatibilityFallbackHandler 
         // We need to make sure that the entryPoint's requested prefund is in bounds
         require(requiredPrefund <= userOp.requiredPreFund(), "Prefund too high");
 
-        address entryPoint = _msgSender();
+        // removed this. entrypoint gave weird results
+        // address entryPoint = _msgSender();
+        address entryPoint = msg.sender;
+        console2.log("Entrypoint: %s", entryPoint);
         require(entryPoint == supportedEntryPoint, "Unsupported entry point");
         _validateSignatures(entryPoint, userOp);
+        console2.log("4");
 
         if (requiredPrefund != 0) {
             Safe(safeAddress).execTransactionFromModule(entryPoint, requiredPrefund, "", 0);

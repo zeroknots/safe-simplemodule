@@ -1,4 +1,4 @@
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 import "safe-tools/SafeTestTools.sol";
 import "forge-std/Test.sol";
