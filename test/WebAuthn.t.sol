@@ -1,11 +1,11 @@
-import "./Setup.t.sol";
+import "./setup/Setup.t.sol";
 import "../src/SafeModuleSimple.sol";
 import "../src/guards/SubGuardFunctionSigBlacklist.sol";
 
 import "../src/modules/Webauthn/WebAuthn.sol";
 import "../src/modules/ERC4337Diatomic/UserOperation.sol";
 
-import "./ERC4337.t.sol";
+import "./setup/ERC4337.t.sol";
 
 contract WebauthnTest is ERC4337Test {
     using SafeTestLib for SafeInstance;
@@ -45,6 +45,8 @@ contract WebauthnTest is ERC4337Test {
             )
         });
 
-        vm.startPrank(entrypoint);
+        vm.startPrank(account);
+        erc4337Module.validateUserOp(userOp, "", 1);
+        vm.stopPrank();
     }
 }

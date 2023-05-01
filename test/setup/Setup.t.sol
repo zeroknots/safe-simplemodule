@@ -3,12 +3,12 @@ pragma solidity 0.8.19;
 import "safe-tools/SafeTestTools.sol";
 import "forge-std/Test.sol";
 
-import "../src/SafeModuleSimple.sol";
-import "../src/RhinestoneClient.sol";
+import "../../src/SafeModuleSimple.sol";
+import "../../src/RhinestoneClient.sol";
 import "@gnosis.pm/base/GuardManager.sol";
-import "../src/guards/GuardRouter.sol";
+import "../../src/guards/GuardRouter.sol";
 
-contract SafeModuleTest is Test, SafeTestTools {
+abstract contract SafeModuleTest is Test, SafeTestTools {
     using SafeTestLib for SafeInstance;
 
     SafeInstance instance;
@@ -16,7 +16,7 @@ contract SafeModuleTest is Test, SafeTestTools {
     SafeModuleSimple simpleModule;
     uint256[] ownerPKs;
 
-    function setUp() public {
+    function setUp() public virtual {
         // setup private keys of owners
         instance = setupSafe();
     }

@@ -6,6 +6,8 @@ import "./CompatibilityFallbackHandler.sol";
 import "./UserOperation.sol";
 import "../../interfaces/Safe.sol";
 
+import "forge-std/console2.sol";
+
 /// @title EIP4337Module
 /// TODO should implement default fallback methods
 abstract contract EIP4337Module is HandlerContext, CompatibilityFallbackHandler {
@@ -39,9 +41,13 @@ abstract contract EIP4337Module is HandlerContext, CompatibilityFallbackHandler 
         // the sender is the Safe specified in the userOperation
         require(safeAddress == msg.sender, "Invalid Caller");
 
+        console2.log("1");
+
         validateReplayProtection(userOp);
+        console2.log("2");
 
         require(expectedExecutionFunctionId == bytes4(userOp.callData), "Unsupported execution function id");
+        console2.log("3");
 
         // We need to make sure that the entryPoint's requested prefund is in bounds
         require(requiredPrefund <= userOp.requiredPreFund(), "Prefund too high");

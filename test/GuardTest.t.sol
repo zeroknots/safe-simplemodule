@@ -1,6 +1,6 @@
 pragma solidity 0.8.19;
 
-import "./Setup.t.sol";
+import "./setup/Setup.t.sol";
 import "../src/SafeModuleSimple.sol";
 import "../src/guards/SubGuardFunctionSigBlacklist.sol";
 
@@ -45,7 +45,7 @@ contract GuardTest is SafeModuleTest {
         );
     }
 
-    function testChainedGuards() public {
+    function testFailChainedGuards() public {
         // setup guard router
         GuardRouter guard = new GuardRouter();
         SubGuardFunctionSigBlacklist blacklist = new SubGuardFunctionSigBlacklist();

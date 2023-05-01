@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.17;
 
-import "../lib/Secp256r1.sol";
-import "../lib/Base64.sol";
-import "../modules/ERC4337Diatomic/UserOperation.sol";
+import "../../lib/Secp256r1.sol";
+import "../../lib/Base64.sol";
+import "../../modules/ERC4337Diatomic/UserOperation.sol";
 
 library WebAuthnLib {
     bytes32 constant NAMESPACE = "rhinestone.plugin.webauthn";
