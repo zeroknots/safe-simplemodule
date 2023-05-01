@@ -2,10 +2,12 @@ import "./Setup.t.sol";
 import "../src/SafeModuleSimple.sol";
 import "../src/guards/SubGuardFunctionSigBlacklist.sol";
 
-import "../src/modules/WebAuthn.sol";
+import "../src/modules/Webauthn/WebAuthn.sol";
 import "../src/modules/ERC4337Diatomic/UserOperation.sol";
 
-contract WebauthnTest is SafeModuleTest {
+import "./ERC4337.t.sol";
+
+contract WebauthnTest is ERC4337Test {
     using SafeTestLib for SafeInstance;
 
     WebAuthn webauthn;
@@ -43,8 +45,6 @@ contract WebauthnTest is SafeModuleTest {
             )
         });
 
-
         vm.startPrank(entrypoint);
-
     }
 }
