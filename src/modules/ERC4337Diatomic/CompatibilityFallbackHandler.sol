@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@gnosis.pm/safe-contracts/contracts/handler/DefaultCallbackHandler.sol";
-import "@gnosis.pm/safe-contracts/contracts/interfaces/ISignatureValidator.sol";
-import "../interfaces/Safe.sol";
+import "@gnosis.pm/handler/DefaultCallbackHandler.sol";
+import "@gnosis.pm/interfaces/ISignatureValidator.sol";
+import "../../interfaces/Safe.sol";
 
 /// @title Compatibility Fallback Handler - fallback handler to provider compatibility between pre 1.3.0 and 1.3.0+ Safe contracts
 /// @author Richard Meissner - <richard@gnosis.pm>
