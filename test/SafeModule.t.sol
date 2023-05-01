@@ -5,6 +5,8 @@ import "forge-std/Test.sol";
 
 import "../src/SafeModuleSimple.sol";
 import "../src/RhinestoneClient.sol";
+import "@gnosis.pm/base/GuardManager.sol";
+import "../src/guards/GuardRouter.sol";
 
 contract RhinestoneModule {
     function foo1() public view {
@@ -152,5 +154,35 @@ contract SafeModuleTest is Test, SafeTestTools {
             signature
         );
         // assertTrue(instance.safe.isModuleEnabled(backdoorModule));
+    }
+
+    function testEnableGuardRouter() public {
+        uint256[] memory ownerPKs = new uint256[](1);
+        ownerPKs[0] = 12345;
+
+        GuardRouter guardRouter = new GuardRouter();
+
+        SafeInstance memory instance = _setupSafe({ownerPKs: ownerPKs, threshold: 1, initialBalance: 1 ether});
+        bytes memory exec_setGuard = abi.encodeWithSelector(GuardManager.setGuard.selector, address(guardRouter));
+
+        // prepare signature for transaction
+        (uint8 v, bytes32 r, bytes32 s) = instance.signTransaction(
+            ownerPKs[0], address(instance.safe), 0, exec_setGuard, Enum.Operation.Call, 0, 0, 0, address(0), address(0)
+        );
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        // exec transaction
+        instance.safe.execTransaction(
+            address(instance.safe),
+            0,
+            exec_setGuard,
+            Enum.Operation.Call,
+            0,
+            0,
+            0,
+            address(0),
+            payable(address(0)),
+            signature
+        );
     }
 }
